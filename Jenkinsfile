@@ -8,8 +8,8 @@ pipeline {
         stage('testing') {
             steps {
                 sh '''
-                    npm -version
-                    node -version '''
+                    npm --version
+                    node --version '''
         }
     }
     }
