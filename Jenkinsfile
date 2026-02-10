@@ -26,6 +26,17 @@ pipeline {
                 '''
             }
         }
+
+        stage('OWASP dependency checker'){
+            steps{
+                dependencyCheck additionalArguments:
+                '''
+                    --scan \',/\'
+                    --out \',/\'
+                    --format \'ALL\'
+                    --prettyPrint ''' , adcInstallation: 'OWASP-DepCheck-10'
+            }
+        }
     }
 }
 
