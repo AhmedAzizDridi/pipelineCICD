@@ -12,6 +12,11 @@ pipeline {
                     node --version '''
         }
     }
+        stage('installing dependencies') {
+            steps {
+                sh 'npm install --no-audit'
+            }
+        }
     }
 }
 
