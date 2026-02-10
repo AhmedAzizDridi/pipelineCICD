@@ -31,8 +31,8 @@ pipeline {
             steps{
                 dependencyCheck additionalArguments:
                 '''
-                    --scan \',/\'
-                    --out \',/\'
+                    --scan \'. /\'
+                    --out \'./\'
                     --format \'ALL\'
                     --prettyPrint ''' , adcInstallation: 'OWASP-DepCheck-10'
             }
