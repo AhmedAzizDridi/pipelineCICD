@@ -7,8 +7,9 @@ pipeline {
     stages {
         stage('testing') {
             steps {
-                sh 'npm -version
-                node -version '
+                sh '''
+                    npm -version
+                    node -version '''
         }
     }
     }
