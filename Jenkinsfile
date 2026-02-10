@@ -1,8 +1,8 @@
 pipeline {
+    agent any
     stage('testing') {
         steps {
-            sh 'npm -v'
-            sh 'node -v'
+            echo 'testing'
         }
     }
 }
