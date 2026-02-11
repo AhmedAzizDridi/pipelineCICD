@@ -17,7 +17,8 @@ pipeline {
                 sh 'npm install --no-audit'
             }
         }
-
+        stage('Dep Scanning'){
+            parallel{
         stage('Npm audit'){
             steps {
                 sh '''
@@ -35,6 +36,8 @@ pipeline {
                     --out \'./\'
                     --format \'ALL\'
                     --prettyPrint ''' , odcInstallation: 'OWASP-DepCheck-10'
+            }
+        }
             }
         }
     }
