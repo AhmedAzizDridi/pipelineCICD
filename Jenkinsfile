@@ -30,15 +30,24 @@ pipeline {
 
         stage('OWASP dependency checker'){
             steps{
-                dependencyCheck additionalArguments: '''  --scan \\\'. /\\\'
-                    --out \\\'./\\\'
-                    --format \\\'ALL\\\'
-                    --prettyPrint ''', odcInstallation: 'OWASP-DepCheck-10'
+               sh 'mkdir -p odc-report'
+            dependencyCheck(
+              odcInstallation: 'OWASP-DepCheck-10',
+              additionalArguments: '--scan . --out odc-report --format ALL --prettyPrint'
+            )
+            sh 'ls -la odc-report || true'
             }
         }
             }
         }
     }
+post {
+    always {
+      archiveArtifacts artifacts: 'odc-report/**', allowEmptyArchive: true
+      dependencyCheckPublisher pattern: 'odc-report/dependency-check-report.xml'
+    }
+  }
+
 }
 
 
