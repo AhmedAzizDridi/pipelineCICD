@@ -41,7 +41,7 @@ pipeline {
             }
         }
         stage('report html'){
-            step{
+            steps{
             publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
         }
     }}
