@@ -30,23 +30,26 @@ pipeline {
 
         stage('OWASP dependency checker'){
             steps{
-               sh 'mkdir -p odc-report'
+              // sh 'mkdir -p odc-report'
             dependencyCheck(
               odcInstallation: 'OWASP-DepCheck-10',
               additionalArguments: '--scan . --out odc-report --format ALL --prettyPrint'
             )
-            sh 'ls -la odc-report || true'
+            //sh 'ls -la odc-report || true'
             }
         }
             }
         }
+        stage('report html'){
+            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+        }
     }
-post {
-    always {
-      archiveArtifacts artifacts: 'odc-report/**', allowEmptyArchive: true
-      dependencyCheckPublisher pattern: 'odc-report/dependency-check-report.xml'
-    }
-  }
+//post {
+    //always {
+     // archiveArtifacts artifacts: 'odc-report/**', allowEmptyArchive: true
+     // dependencyCheckPublisher pattern: 'odc-report/dependency-check-report.xml'
+    //}
+  //}
 
 }
 
