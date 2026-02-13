@@ -44,6 +44,12 @@ pipeline {
             sh 'ls -la odc-report || true'
           }
         }
+
+      }
+    }
+    stage('Testing'){
+      steps {
+        sh ' npm test'
       }
     }
   }
@@ -66,4 +72,5 @@ pipeline {
       ])
     }
   }
+
 }
