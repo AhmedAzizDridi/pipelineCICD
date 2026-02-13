@@ -61,7 +61,7 @@ pipeline {
       node -e "require('net').connect(27017,'172.24.128.1').on('connect',()=>{console.log('✅ Mongo reachable from Jenkins');process.exit(0)}).on('error',(e)=>{console.error('❌ Mongo NOT reachable:',e.message);process.exit(1)})"
 '''
 
-    sh 'npm test'
+    sh 'npm test -- --full-trace'
   }
 }
   }
