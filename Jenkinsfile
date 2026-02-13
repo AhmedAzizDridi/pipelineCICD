@@ -4,6 +4,9 @@ pipeline {
   tools {
     nodejs 'nodejs-25.5'
   }
+  environment {
+    MONGO_URL = 'mongodb://127.0.0.1:27017/SuperData'
+  }
 
   stages {
     stage('testing') {
@@ -48,9 +51,7 @@ pipeline {
       }
     }
    stage('Testing') {
-  environment {
-    MONGO_URL = 'mongodb://127.0.0.1:27017/SuperData'
-  }
+  
   steps {
     sh 'npm test'
   }
