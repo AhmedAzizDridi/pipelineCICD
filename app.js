@@ -3,7 +3,7 @@ const fs = require('fs');
 const express = require('express');
 const OS = require('os');
 const bodyParser = require('body-parser');
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
@@ -16,31 +16,21 @@ app.use(cors());
    MONGODB CONNECTION
 ========================= */
 
-mongoose.set('bufferCommands', false); // prevent buffering timeout
+mongoose.set('bufferCommands', false); // fail fast if not connected
 
 const mongoUrl = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/SuperData';
+console.log('Connecting to Mongo:', mongoUrl);
 
-async function start() {
-  try {
-    console.log('Connecting to Mongo:', mongoUrl);
-
-    await mongoose.connect(mongoUrl, {
-      serverSelectionTimeoutMS: 5000
-    });
-
+// Promise that resolves when Mongo is connected
+const mongoReady = mongoose
+  .connect(mongoUrl, { serverSelectionTimeoutMS: 5000 })
+  .then(() => {
     console.log('MongoDB Connection Successful');
-
-    app.listen(3000, () => {
-      console.log("Server successfully running on port - 3000");
-    });
-
-  } catch (err) {
-    console.error("MongoDB Connection Failed:", err);
-    process.exit(1); // fail CI clearly
-  }
-}
-
-start();
+  })
+  .catch((err) => {
+    console.error('MongoDB Connection Failed:', err);
+    process.exit(1);
+  });
 
 /* =========================
    SCHEMA + MODEL
@@ -54,7 +44,7 @@ const dataSchema = new Schema({
   description: String,
   image: String,
   velocity: String,
-  distance: String
+  distance: String,
 });
 
 const planetModel = mongoose.model('planets', dataSchema);
@@ -65,19 +55,19 @@ const planetModel = mongoose.model('planets', dataSchema);
 
 app.post('/planet', async function (req, res) {
   try {
-    const planetData = await planetModel.findOne({
-      id: req.body.id
-    });
+    // Make extra sure DB is connected before querying
+    await mongoReady;
+
+    const planetData = await planetModel.findOne({ id: req.body.id });
 
     if (!planetData) {
-      return res.status(404).send("Planet not found");
+      return res.status(404).send('Planet not found');
     }
 
     return res.send(planetData);
-
   } catch (err) {
     console.error(err);
-    return res.status(500).send("Error in Planet Data");
+    return res.status(500).send('Error in Planet Data');
   }
 });
 
@@ -98,20 +88,30 @@ app.get('/api-docs', (req, res) => {
 app.get('/os', function (req, res) {
   res.json({
     os: OS.hostname(),
-    env: process.env.NODE_ENV
+    env: process.env.NODE_ENV,
   });
 });
 
 app.get('/live', function (req, res) {
-  res.json({ status: "live" });
+  res.json({ status: 'live' });
 });
 
 app.get('/ready', function (req, res) {
-  res.json({ status: "ready" });
+  res.json({ status: 'ready' });
+});
+
+/* =========================
+   START SERVER (only when ready)
+========================= */
+
+mongoReady.then(() => {
+  app.listen(3000, () => {
+    console.log('Server successfully running on port - 3000');
+  });
 });
 
 /* =========================
    EXPORT FOR TESTING
 ========================= */
 
-module.exports = app;
+module.exports = { app, mongoReady };
