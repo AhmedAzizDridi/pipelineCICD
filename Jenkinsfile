@@ -62,6 +62,8 @@ pipeline {
 '''
 
     sh 'npm test -- --full-trace'
+
+    junit allowEmptyResults: true, stdioRetention: '', testResults: 'test-results.xml'
   }
 }
   }
