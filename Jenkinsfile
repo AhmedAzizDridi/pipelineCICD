@@ -5,7 +5,8 @@ pipeline {
     nodejs 'nodejs-25.5'
   }
   environment {
-    MONGO_URL = 'mongodb://127.0.0.1:27017/SuperData'
+    MONGO_URL = 'mongodb://host.docker.internal:27017/SuperData'
+
   }
 
   stages {
