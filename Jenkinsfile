@@ -15,6 +15,8 @@ pipeline {
           npm --version
           node --version
         '''
+        sh 'echo "MONGO_URL=$MONGO_URL"'
+
       }
     }
 
