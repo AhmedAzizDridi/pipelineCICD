@@ -47,14 +47,14 @@ pipeline {
 
       }
     }
-    stage('Testing'){
-      steps {
-        environment {
+   stage('Testing') {
+  environment {
     MONGO_URL = 'mongodb://127.0.0.1:27017/SuperData'
   }
-        sh ' npm test'
-      }
-    }
+  steps {
+    sh 'npm test'
+  }
+}
   }
 
   post {
