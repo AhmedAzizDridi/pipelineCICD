@@ -5,7 +5,7 @@ pipeline {
     nodejs 'nodejs-25.5'
   }
   environment {
-     MONGO_URL = 'mongodb://host.docker.internal:27017/SuperData'
+    MONGO_URL = 'mongodb://172.24.128.1:27017/SuperData'
   }
 
   stages {
@@ -58,7 +58,7 @@ pipeline {
   
   steps {
     sh '''
-  node -e "require('net').connect(27017,'127.0.0.1').on('connect',()=>{console.log('✅ Mongo port reachable');process.exit(0)}).on('error',(e)=>{console.error('❌ Mongo port NOT reachable:',e.message);process.exit(1)})"
+      node -e "require('net').connect(27017,'10.255.255.254').on('connect',()=>{console.log('✅ Mongo reachable from Jenkins');process.exit(0)}).on('error',(e)=>{console.error('❌ Mongo NOT reachable:',e.message);process.exit(1)})"
 '''
 
     sh 'npm test'
