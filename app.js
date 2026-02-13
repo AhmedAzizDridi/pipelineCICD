@@ -1,43 +1,67 @@
 const path = require('path');
-const fs = require('fs')
+const fs = require('fs');
 const express = require('express');
 const OS = require('os');
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
-const app = express();
-const cors = require('cors')
-const serverless = require('serverless-http')
+const cors = require('cors');
 
+const app = express();
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/')));
-app.use(cors())
+app.use(cors());
 
-mongoose.connect('mongodb://127.0.0.1:27017/SuperData',{
-    
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, function(err) {
-    if (err) {
-        console.log("error!! " + err)
-    } else {
-      //  console.log("MongoDB Connection Successful")
-    }
-})
+/* =========================
+   MONGODB CONNECTION
+========================= */
 
-var Schema = mongoose.Schema;
+mongoose.set('bufferCommands', false); // prevent buffering timeout
 
-var dataSchema = new Schema({
-    name: String,
-    id: Number,
-    description: String,
-    image: String,
-    velocity: String,
-    distance: String
+const mongoUrl = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/SuperData';
+
+async function start() {
+  try {
+    console.log('Connecting to Mongo:', mongoUrl);
+
+    await mongoose.connect(mongoUrl, {
+      serverSelectionTimeoutMS: 5000
+    });
+
+    console.log('MongoDB Connection Successful');
+
+    app.listen(3000, () => {
+      console.log("Server successfully running on port - 3000");
+    });
+
+  } catch (err) {
+    console.error("MongoDB Connection Failed:", err);
+    process.exit(1); // fail CI clearly
+  }
+}
+
+start();
+
+/* =========================
+   SCHEMA + MODEL
+========================= */
+
+const Schema = mongoose.Schema;
+
+const dataSchema = new Schema({
+  name: String,
+  id: Number,
+  description: String,
+  image: String,
+  velocity: String,
+  distance: String
 });
-var planetModel = mongoose.model('planets', dataSchema);
 
+const planetModel = mongoose.model('planets', dataSchema);
 
+/* =========================
+   ROUTES
+========================= */
 
 app.post('/planet', async function (req, res) {
   try {
@@ -57,45 +81,37 @@ app.post('/planet', async function (req, res) {
   }
 });
 
-
-app.get('/',   async (req, res) => {
-    res.sendFile(path.join(__dirname, '/', 'index.html'));
+app.get('/', async (req, res) => {
+  res.sendFile(path.join(__dirname, '/', 'index.html'));
 });
 
 app.get('/api-docs', (req, res) => {
-    fs.readFile('oas.json', 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading file:', err);
-        res.status(500).send('Error reading file');
-      } else {
-        res.json(JSON.parse(data));
-      }
-    });
+  fs.readFile('oas.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading file:', err);
+      return res.status(500).send('Error reading file');
+    }
+    res.json(JSON.parse(data));
   });
-  
-app.get('/os',   function(req, res) {
-    res.setHeader('Content-Type', 'application/json');
-    res.send({
-        "os": OS.hostname(),
-        "env": process.env.NODE_ENV
-    });
-})
+});
 
-app.get('/live',   function(req, res) {
-    res.setHeader('Content-Type', 'application/json');
-    res.send({
-        "status": "live"
-    });
-})
+app.get('/os', function (req, res) {
+  res.json({
+    os: OS.hostname(),
+    env: process.env.NODE_ENV
+  });
+});
 
-app.get('/ready',   function(req, res) {
-    res.setHeader('Content-Type', 'application/json');
-    res.send({
-        "status": "ready"
-    });
-})
+app.get('/live', function (req, res) {
+  res.json({ status: "live" });
+});
 
-app.listen(3000, () => { console.log("Server successfully running on port - " +3000); })
+app.get('/ready', function (req, res) {
+  res.json({ status: "ready" });
+});
+
+/* =========================
+   EXPORT FOR TESTING
+========================= */
+
 module.exports = app;
-
-//module.exports.handler = serverless(app)

@@ -16,6 +16,7 @@ pipeline {
           node --version
         '''
         sh 'echo "MONGO_URL=$MONGO_URL"'
+        
 
       }
     }
@@ -55,6 +56,10 @@ pipeline {
    stage('Testing') {
   
   steps {
+    sh '''
+  node -e "require('net').connect(27017,'127.0.0.1').on('connect',()=>{console.log('✅ Mongo port reachable');process.exit(0)}).on('error',(e)=>{console.error('❌ Mongo port NOT reachable:',e.message);process.exit(1)})"
+'''
+
     sh 'npm test'
   }
 }
