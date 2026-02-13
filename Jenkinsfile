@@ -5,19 +5,11 @@ pipeline {
     nodejs 'nodejs-25.5'
   }
   environment {
-    MONGO_URL = 'mongodb://host.docker.internal:27017/SuperData'
-
+     MONGO_URL = 'mongodb://host.docker.internal:27017/SuperData'
   }
 
   stages {
-    stage('Start MongoDB') {
-  steps {
-    sh '''
-      docker rm -f mongo-ci || true
-      docker run -d --name mongo-ci -p 27017:27017 mongo:6
-    '''
-  }
-}
+    
     stage('testing') {
       steps {
         sh '''
