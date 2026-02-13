@@ -63,7 +63,6 @@ pipeline {
 
     sh 'npm test -- --full-trace'
 
-    junit allowEmptyResults: true, stdioRetention: '', testResults: 'test-results.xml'
   }
 }
   }
@@ -75,6 +74,7 @@ pipeline {
       dependencyCheckPublisher pattern: 'odc-report/dependency-check-report.xml'
 
       junit allowEmptyResults: true, keepProperties: true, testResults: 'odc-report/dependency-check-junit.xml'
+      junit allowEmptyResults: true, stdioRetention: '', testResults: 'odc-report/test-results.xml'
 
       publishHTML(target: [
         allowMissing: true,
