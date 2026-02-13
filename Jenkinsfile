@@ -9,6 +9,14 @@ pipeline {
   }
 
   stages {
+    stage('Start MongoDB') {
+  steps {
+    sh '''
+      docker rm -f mongo-ci || true
+      docker run -d --name mongo-ci -p 27017:27017 mongo:6
+    '''
+  }
+}
     stage('testing') {
       steps {
         sh '''
